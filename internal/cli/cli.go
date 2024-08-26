@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"books/internal/service"
+	"github.com/aleroxac/fullcycle-gointensivo7/internal/service"
 )
 
 // BookCLI lida com a interface de linha de comando para buscar e simular leitura de livros.

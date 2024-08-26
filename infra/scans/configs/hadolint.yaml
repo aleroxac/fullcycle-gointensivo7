@@ -1,0 +1,46 @@
+trustedRegistries: ["docker.io"]
+disable-ignore-pragma: true
+verbose: false
+failure-threshold: info
+
+
+no-color: true
+
+
+strict-labels: true
+label-schema:
+  maintainer: email
+  vendor: text
+
+  org.label-schema.author-name: text
+  org.label-schema.author-username: text
+  org.label-schema.author-title: text
+  org.label-schema.author-email: email
+
+  org.label-schema.license: spdx
+  org.label-schema.schema-version: semver
+  org.label-schema.vcs-ref: hash
+  org.label-schema.vcs-url: url
+  org.label-schema.build-date: rfc3339
+
+  org.label-schema.name: text
+  org.label-schema.base: text
+  org.label-schema.version: semver
+  org.label-schema.description: text
+  org.label-schema.usage: text
+  org.label-schema.url: url
+
+  org.label-schema.os-name: text
+  org.label-schema.os-version: semver
+
+  org.label-schema.docker.cmd: text
+  org.label-schema.docker.cmd.devel: text
+  org.label-schema.docker.cmd.test: text
+  org.label-schema.docker.cmd.debug: text
+  org.label-schema.docker.cmd.help: text
+  org.label-schema.docker.params: text
+
+  org.label-schema.app.port: text
+  org.label-schema.app.healthcheck.path: text
+  org.label-schema.app.lang: text
+  org.label-schema.app.lang.version: semver

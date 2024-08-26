@@ -1,0 +1,59 @@
+### IMPORTANT: Visual Studio Code Extension ID: humao.rest-client
+
+
+### --------------- Listar todos os livros
+GET http://localhost:8080/books
+Accept: application/json
+
+
+
+### ---------------Adicionar um novo livro: #1
+POST http://localhost:8080/books
+Content-Type: application/json
+
+{
+  "title": "Clean Code",
+  "author": "Robert C. Martin",
+  "genre": "Software Engineering"
+}
+
+### --------------- Adicionar um novo livro: #2
+POST http://localhost:8080/books
+Content-Type: application/json
+
+{
+  "title": "Clean Architecture",
+  "author": "Robert C. Martin",
+  "genre": "Software Engineering"
+}
+
+
+
+### --------------- Listar 1 livro especifico
+GET http://localhost:8080/books/2
+Accept: application/json
+
+
+
+### --------------- Atualizar um livro existente
+PUT http://localhost:8080/books/2
+Content-Type: application/json
+
+{
+  "title": "Clean Architecture",
+  "author": "Robert C. Martin",
+  "genre": "Software Architecture"
+}
+
+
+
+### --------------- Deletar um livro
+DELETE http://localhost:8080/books/2
+
+### Simular leitura de múltiplos livros via POST com JSON
+POST http://localhost:8080/books/read
+Content-Type: application/json
+
+{
+  "book_ids": [1]
+}

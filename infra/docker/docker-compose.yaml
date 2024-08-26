@@ -1,0 +1,48 @@
+include:
+  - "composes/database.yaml"
+
+
+
+networks:
+  fullcycle:
+
+
+
+# services:
+#   gobook:
+#     hostname: gobook
+#     container_name: gobook
+#     restart: always
+#     env_file:
+#       - .env
+#       - ../../.env
+#     build:
+#       context: ../../.build
+#       dockerfile: ../../.build/Dockerfile
+#       args:
+#         APP_PORT: ${APP_PORT}
+#         APP_HEALTHCHECK_PATH: ${APP_HEALTHCHECK_PATH}
+#         VCS_REF: ${VCS_REF}
+#         VCS_URL: ${VCS_URL}
+#         BUILD_DATE: ${BUILD_DATE}
+#         IMAGE_VERSION: ${IMAGE_VERSION}
+#       tags: 
+#         - aleroxac/fullcycle-gointensivo7-gobook:v${IMAGE_VERSION}
+#         - aleroxac/fullcycle-gointensivo7-gobook:latest
+#       platforms:
+#         - linux/amd64
+#     ports:
+#       - ${APP_PORT}:${APP_PORT}
+#     networks: 
+#       - fullcycle
+#     healthcheck:
+#       test: ["CMD", "/app/healthcheck"]
+#       start_period: 2s
+#       interval: 1s
+#       timeout: 1s
+#       retries: 3
+#     depends_on:
+#       postgresql:
+#         condition: service_healthy
+#       # otel-collector:
+#       #   condition: service_started

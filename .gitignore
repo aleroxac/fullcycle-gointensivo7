@@ -1,0 +1,16 @@
+## Coverage reportfiles
+**/coverage.out
+**/coverage.html
+**/coverage.json
+
+## TODO
+**/TODO.md
+
+## Temporary folders
+**/.build/
+**/.reports/
+
+## configs
+**/.env
+**/config.yaml
+**/config.json

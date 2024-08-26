@@ -1,0 +1,17 @@
+path: .
+exclude-paths: ".env,.env.example,.dockerignore,.gitignore"
+
+type: ["Dockerfile"]
+fail-on: [high, medium, low, info]
+verbose: false
+log-file: false
+
+output-name: kics
+output-path: .reports
+report-formats: html
+
+bom: true
+no-progress: true
+minimal-ui: false
+no-color: false
+ci: false

@@ -2,11 +2,14 @@ package web
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
-	"books/internal/service"
+	"github.com/aleroxac/fullcycle-gointensivo7/internal/entity"
+	"github.com/aleroxac/fullcycle-gointensivo7/internal/service"
+	"github.com/google/uuid"
 )
 
 // BookHandlers lida com as requisições HTTP relacionadas a livros.
@@ -38,13 +41,14 @@ func (h *BookHandlers) GetBooks(w http.ResponseWriter, r *http.Request) {
 
 // CreateBook lida com a requisição POST /books.
 func (h *BookHandlers) CreateBook(w http.ResponseWriter, r *http.Request) {
-	var book service.Book
+	var book entity.Book
 	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
 		http.Error(w, "invalid request payload", http.StatusBadRequest)
 		return
 	}
 
 	if err := h.service.CreateBook(&book); err != nil {
+		fmt.Println(err)
 		http.Error(w, "failed to create book", http.StatusInternalServerError)
 		return
 	}
@@ -79,13 +83,14 @@ func (h *BookHandlers) GetBookByID(w http.ResponseWriter, r *http.Request) {
 // UpdateBook lida com a requisição PUT /books/{id}.
 func (h *BookHandlers) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
-	id, err := strconv.Atoi(idStr)
+
+	id, err := uuid.FromBytes([]byte(idStr))
 	if err != nil {
 		http.Error(w, "invalid book ID", http.StatusBadRequest)
 		return
 	}
 
-	var book service.Book
+	var book entity.Book
 	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
 		http.Error(w, "invalid request payload", http.StatusBadRequest)
 		return

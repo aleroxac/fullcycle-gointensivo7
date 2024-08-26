@@ -1,0 +1,39 @@
+
+
+services:
+  postgresql:
+    container_name: postgresql
+    hostname: postgresql
+    restart: always
+    image: postgres:9.6-alpine
+    environment:
+      POSTGRES_DB: books
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - 5432:5432
+    networks:
+      - fullcycle
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrations:
+    hostname: migrations
+    container_name: migrations
+    restart: no
+    image: migrate/migrate:v4.17.1
+    networks: 
+      - fullcycle
+    environment:
+      POSTGRES_DB: books
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    volumes:
+      - ../../sql/migrations:/migrations
+    command: -path=/migrations -database "postgres://root:root@postgresql:5432/books?sslmode=disable" -verbose up
+    depends_on:
+      postgresql:
+        condition: service_healthy

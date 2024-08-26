@@ -5,45 +5,30 @@ import (
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/aleroxac/fullcycle-gointensivo7/internal/entity"
 )
 
-// Book representa um livro no sistema.
-type Book struct {
-	ID     int
-	Title  string
-	Author string
-	Genre  string
-}
-
-// BookService lida com a lógica de negócios e persistência de livros.
 type BookService struct {
 	db *sql.DB
 }
 
-// NewBookService cria uma nova instância de BookService.
 func NewBookService(db *sql.DB) *BookService {
 	return &BookService{db: db}
 }
 
-// CreateBook cria um novo livro no banco de dados.
-func (s *BookService) CreateBook(book *Book) error {
-	query := "INSERT INTO books (title, author, genre) VALUES (?, ?, ?)"
-	result, err := s.db.Exec(query, book.Title, book.Author, book.Genre)
+func (s *BookService) CreateBook(book *entity.Book) error {
+	query := "INSERT INTO books (title, author, genre) VALUES ($1, $2, $3)"
+	_, err := s.db.Exec(query, book.Title, book.Author, book.Genre)
 	if err != nil {
+		fmt.Println("create-book-error:", err)
 		return err
 	}
 
-	lastInsertID, err := result.LastInsertId()
-	if err != nil {
-		return err
-	}
-
-	book.ID = int(lastInsertID)
 	return nil
 }
 
-// GetBooks retorna todos os livros do banco de dados.
-func (s *BookService) GetBooks() ([]Book, error) {
+func (s *BookService) GetBooks() ([]entity.Book, error) {
 	query := "SELECT id, title, author, genre FROM books"
 	rows, err := s.db.Query(query)
 	if err != nil {
@@ -51,9 +36,9 @@ func (s *BookService) GetBooks() ([]Book, error) {
 	}
 	defer rows.Close()
 
-	var books []Book
+	var books []entity.Book
 	for rows.Next() {
-		var book Book
+		var book entity.Book
 		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Genre); err != nil {
 			return nil, err
 		}
@@ -63,12 +48,11 @@ func (s *BookService) GetBooks() ([]Book, error) {
 	return books, nil
 }
 
-// GetBookByID retorna um livro pelo seu ID.
-func (s *BookService) GetBookByID(id int) (*Book, error) {
-	query := "SELECT id, title, author, genre FROM books WHERE id = ?"
+func (s *BookService) GetBookByID(id int) (*entity.Book, error) {
+	query := "SELECT id, title, author, genre FROM books WHERE id = $1"
 	row := s.db.QueryRow(query, id)
 
-	var book Book
+	var book entity.Book
 	if err := row.Scan(&book.ID, &book.Title, &book.Author, &book.Genre); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
@@ -79,42 +63,22 @@ func (s *BookService) GetBookByID(id int) (*Book, error) {
 	return &book, nil
 }
 
-// UpdateBook atualiza as informações de um livro no banco de dados.
-func (s *BookService) UpdateBook(book *Book) error {
-	query := "UPDATE books SET title = ?, author = ?, genre = ? WHERE id = ?"
-	_, err := s.db.Exec(query, book.Title, book.Author, book.Genre, book.ID)
+func (s *BookService) UpdateBook(book *entity.Book) error {
+	query := "UPDATE books SET title = $1, author = $2, genre = $3 WHERE id = $4"
+	result, err := s.db.Exec(query, book.Title, book.Author, book.Genre, book.ID)
+
+	fmt.Println("result:", result)
+	fmt.Println("error:", err)
+
 	return err
 }
 
-// DeleteBook deleta um livro do banco de dados.
 func (s *BookService) DeleteBook(id int) error {
-	query := "DELETE FROM books WHERE id = ?"
+	query := "DELETE FROM books WHERE id = $1"
 	_, err := s.db.Exec(query, id)
 	return err
 }
 
-// SearchBooksByName busca livros pelo nome (título) no banco de dados.
-func (s *BookService) SearchBooksByName(name string) ([]Book, error) {
-	query := "SELECT id, title, author, genre FROM books WHERE title LIKE ?"
-	rows, err := s.db.Query(query, "%"+name+"%")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var books []Book
-	for rows.Next() {
-		var book Book
-		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Genre); err != nil {
-			return nil, err
-		}
-		books = append(books, book)
-	}
-
-	return books, nil
-}
-
-// SimulateReading simula a leitura de um livro com base em um tempo de leitura.
 func (s *BookService) SimulateReading(bookID int, duration time.Duration, results chan<- string) {
 	book, err := s.GetBookByID(bookID)
 	if err != nil || book == nil {
@@ -126,11 +90,29 @@ func (s *BookService) SimulateReading(bookID int, duration time.Duration, result
 	results <- fmt.Sprintf("Leitura do livro '%s' concluída!", book.Title)
 }
 
-// SimulateMultipleReadings simula a leitura de múltiplos livros simultaneamente.
-func (s *BookService) SimulateMultipleReadings(bookIDs []int, duration time.Duration) []string {
-	results := make(chan string, len(bookIDs)) // Canal com buffer para evitar bloqueio
+func (s *BookService) SearchBooksByName(name string) ([]entity.Book, error) {
+	query := "SELECT id, title, author, genre FROM books WHERE title LIKE ?"
+	rows, err := s.db.Query(query, "%"+name+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-	// Lança as goroutines para simular a leitura.
+	var books []entity.Book
+	for rows.Next() {
+		var book entity.Book
+		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Genre); err != nil {
+			return nil, err
+		}
+		books = append(books, book)
+	}
+
+	return books, nil
+}
+
+func (s *BookService) SimulateMultipleReadings(bookIDs []int, duration time.Duration) []string {
+	results := make(chan string, len(bookIDs))
+
 	for _, id := range bookIDs {
 		go func(bookID int) {
 			s.SimulateReading(bookID, duration, results)
@@ -141,7 +123,7 @@ func (s *BookService) SimulateMultipleReadings(bookIDs []int, duration time.Dura
 	for range bookIDs {
 		responses = append(responses, <-results)
 	}
-	close(results) // Fechamento do canal após coleta de todos os resultados
+	close(results)
 
 	return responses
 }
