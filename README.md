@@ -1,5 +1,5 @@
 # fullcycle-gointensivo7
-Projeto desenvolvido duranto o evento Go Intensivo da FullCycle.
+Projeto desenvolvido durante o evento Go Intensivo da FullCycle.
 
 
 
